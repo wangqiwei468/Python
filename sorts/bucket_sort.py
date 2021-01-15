@@ -1,57 +1,67 @@
-#!/usr/bin/env python
-# Author: OMKAR PATHAK
-# This program will illustrate how to implement bucket sort algorithm
+#!/usr/bin/env python3
+"""
+Illustrate how to implement bucket sort algorithm.
 
-# Wikipedia says: Bucket sort, or bin sort, is a sorting algorithm that works by distributing the
-# elements of an array into a number of buckets. Each bucket is then sorted individually, either using
-# a different sorting algorithm, or by recursively applying the bucket sorting algorithm. It is a
-# distribution sort, and is a cousin of radix sort in the most to least significant digit flavour.
-# Bucket sort is a generalization of pigeonhole sort. Bucket sort can be implemented with comparisons
-# and therefore can also be considered a comparison sort algorithm. The computational complexity estimates
-# involve the number of buckets.
+Author: OMKAR PATHAK
+This program will illustrate how to implement bucket sort algorithm
 
-#  Time Complexity of Solution:
-#  Best Case O(n); Average Case O(n); Worst Case O(n)
+Wikipedia says: Bucket sort, or bin sort, is a sorting algorithm that works
+by distributing the elements of an array into a number of buckets.
+Each bucket is then sorted individually, either using a different sorting
+algorithm, or by recursively applying the bucket sorting algorithm. It is a
+distribution sort, and is a cousin of radix sort in the most to least
+significant digit flavour.
+Bucket sort is a generalization of pigeonhole sort. Bucket sort can be
+implemented with comparisons and therefore can also be considered a
+comparison sort algorithm. The computational complexity estimates involve the
+number of buckets.
 
-from __future__ import print_function
-from insertion_sort import insertion_sort
-import math
+Time Complexity of Solution:
+Worst case scenario occurs when all the elements are placed in a single bucket.
+The overall performance would then be dominated by the algorithm used to sort each
+bucket. In this case, O(n log n), because of TimSort
 
-DEFAULT_BUCKET_SIZE = 5
+Average Case O(n + (n^2)/k + k), where k is the number of buckets
 
-def bucketSort(myList, bucketSize=DEFAULT_BUCKET_SIZE):
-    if(len(myList) == 0):
-        print('You don\'t have any elements in array!')
+If k = O(n), time complexity is O(n)
 
-    minValue = myList[0]
-    maxValue = myList[0]
+Source: https://en.wikipedia.org/wiki/Bucket_sort
+"""
 
-    # For finding minimum and maximum values
-    for i in range(0, len(myList)):
-        if myList[i] < minValue:
-            minValue = myList[i]
-        elif myList[i] > maxValue:
-            maxValue = myList[i]
 
-    # Initialize buckets
-    bucketCount = math.floor((maxValue - minValue) / bucketSize) + 1
-    buckets = []
-    for i in range(0, bucketCount):
-        buckets.append([])
+def bucket_sort(my_list: list) -> list:
+    """
+    >>> data = [-1, 2, -5, 0]
+    >>> bucket_sort(data) == sorted(data)
+    True
+    >>> data = [9, 8, 7, 6, -12]
+    >>> bucket_sort(data) == sorted(data)
+    True
+    >>> data = [.4, 1.2, .1, .2, -.9]
+    >>> bucket_sort(data) == sorted(data)
+    True
+    >>> bucket_sort([]) == sorted([])
+    True
+    >>> import random
+    >>> collection = random.sample(range(-50, 50), 50)
+    >>> bucket_sort(collection) == sorted(collection)
+    True
+    """
+    if len(my_list) == 0:
+        return []
+    min_value, max_value = min(my_list), max(my_list)
+    bucket_count = int(max_value - min_value) + 1
+    buckets = [[] for _ in range(bucket_count)]
 
-    # For putting values in buckets
-    for i in range(0, len(myList)):
-        buckets[math.floor((myList[i] - minValue) / bucketSize)].append(myList[i])
+    for i in range(len(my_list)):
+        buckets[(int(my_list[i] - min_value) // bucket_count)].append(my_list[i])
 
-    # Sort buckets and place back into input array
-    sortedArray = []
-    for i in range(0, len(buckets)):
-        insertion_sort(buckets[i])
-        for j in range(0, len(buckets[i])):
-            sortedArray.append(buckets[i][j])
+    return [v for bucket in buckets for v in sorted(bucket)]
 
-    return sortedArray
 
-if __name__ == '__main__':
-    sortedArray = bucketSort([12, 23, 4, 5, 3, 2, 12, 81, 56, 95])
-    print(sortedArray)
+if __name__ == "__main__":
+    from doctest import testmod
+
+    testmod()
+    assert bucket_sort([4, 5, 3, 2, 1]) == [1, 2, 3, 4, 5]
+    assert bucket_sort([0, 1, -10, 15, 2, -2]) == [-10, -2, 0, 1, 2, 15]
